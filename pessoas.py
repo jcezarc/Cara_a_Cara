@@ -8,7 +8,7 @@ class Pessoa:
         'tam_cabelo': (['curto', 'médio', 'comprido'], lambda p, v: p.tam_cabelo == v, 20),
         'olhos': (['verdes', 'castanhos', 'pretos'], lambda p, v: p.olhos == v, 12),
         'barba': (['grande', 'curta', 'não tem'], lambda p, v: p.barba == v, 10),
-        'oculos': (['fino', 'grosso', 'de sol', 'não tem'], lambda p, v: p.oculos == v, 10),
+        'oculos': (['finos', 'grossos', 'de sol', 'não tem'], lambda p, v: p.oculos == v, 10),
         'rosto': (['quadrado', 'oval', 'arredondado'], lambda p, v: p.rosto == v, 14)
     }
     lista = []
@@ -25,3 +25,19 @@ class Pessoa:
     def filtro(cls, atributo, valor, igual=True, lista=None):
         pergunta = cls.TODOS_ATRIBUTOS[atributo][1]
         return [p for p in (lista or cls.lista) if pergunta(p, valor) == igual]
+
+    @staticmethod
+    def resumo(lista, tamanho_minimo=2):
+        R = {a: list(set([p.__dict__[a] for p in lista])) for a in Pessoa.TODOS_ATRIBUTOS}
+        return {k: v for k, v in R.items() if len(v) >= tamanho_minimo}
+    
+    @staticmethod
+    def grade(lista):
+        head = {**{a: v[-1] for a, v in Pessoa.TODOS_ATRIBUTOS.items()}, **{'nome': 20}}
+        return '\n{}\n{}\n'.format(
+            ' '.join(c.center(v)[:v] for c, v in head.items()),
+            '+'.join('-'*v for c, v in head.items())
+        ) + '\n'.join(
+            '|'.join(p.__dict__[c].center(v)[:v] for c, v in head.items()) + f': {i}'
+            for i, p in enumerate(lista)
+        )

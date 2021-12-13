@@ -5,21 +5,18 @@ from random import choice
 class Jogador:
     def __init__(self):
         self.suspeitos = Pessoa.lista
-        self.personagem = self.escolha(Pessoa.lista, '>> Escolha um personagem **')
+        self.personagem = self.escolha(Pessoa.lista, '>> Escolha um personagem')
         self.adversario = None
-        self.perguntas = {k: v[0].copy() for k, v in Pessoa.TODOS_ATRIBUTOS.items()}
+        self.perguntas = None
 
     def responde_pergunta(self, atributo, valor):
         return getattr(self.personagem, atributo) == valor
 
     def faz_pergunta(self):
+        self.perguntas = Pessoa.resumo(self.suspeitos)
         atributo = self.escolha(list(self.perguntas), 'FAÇA UMA PERGUNTA sobre...')
-        valores = self.perguntas.pop(atributo)
-        valor = self.escolha(valores, '...igual a...')
-        valores.remove(valor)
-        if len(valores) > 1: 
-            self.perguntas[atributo] = valores
-        print('-'*100, '\n')
+        valor = self.escolha(self.perguntas[atributo], '...igual a...')
+        print('='*100, '\n')
         resposta = self.adversario.responde_pergunta(atributo, valor)
         self.suspeitos = Pessoa.filtro(atributo, valor, resposta, self.suspeitos)        
         if valor == 'não tem':
@@ -37,35 +34,26 @@ class Computador(Jogador):
         return choice(lista)
 
     def exibe_resultado(self):
-        print('Ainda restam {} personagens para o computador descobrir'.format(len(self.suspeitos)))
-        print('-'*100)
+        print('\t{} restantes\n'.format(len(self.suspeitos)), '-'*100)
 
 
 class Humano(Jogador):
     def escolha(self, lista, titulo):
         print(titulo)
         if lista == self.suspeitos:
-            self.exibe_resultado(True)
+            self.exibe_resultado()
         else:
-            print('\n'.join(f'{i} - {p}' for i, p in enumerate(lista, 1)))
+            print('\n'.join(f'{i} - {p}' for i, p in enumerate(lista)))
         i = -1
         while not i in range(len(lista)):
-            i = int(input(': '))-1
+            try:
+                i = int(input(': '))
+            except ValueError:
+                print(titulo)
         return lista[i]
 
-    def exibe_resultado(self, com_numeros=False):
-        cabecalho = {a: v[-1] for a, v in Pessoa.TODOS_ATRIBUTOS.items()}
-        cabecalho['nome'] = 20
-        print('\n{}\n{}'.format(
-            ' '.join(campo.center(tam)[:tam] for campo, tam in cabecalho.items()),
-            '+'.join('-'*tam for campo, tam in cabecalho.items())
-        ))
-        for i, pessoa in enumerate(self.suspeitos, 1):
-            dados = pessoa.__dict__
-            linha = '|'.join(dados[campo].center(tam)[:tam] for campo, tam in cabecalho.items())
-            if com_numeros:
-                linha += f'  => {i}'
-            print(linha)
+    def exibe_resultado(self):
+        print(Pessoa.grade(self.suspeitos))
 
     def responde_pergunta(self, atributo, valor):
         print('Seu personagem: {}'.format(
