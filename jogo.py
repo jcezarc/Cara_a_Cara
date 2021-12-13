@@ -10,7 +10,9 @@ class Jogo:
         shuffle(personagens)
         while personagens:            
             personagem = personagens.pop()
-            Pessoa(personagem).barba = 'tem' if personagem in homens else 'não tem'
+            pessoa = Pessoa(personagem)
+            if personagem in mulheres:
+                pessoa.barba = 'não tem'
         computador, humano = Computador(), Humano()
         computador.adversario = humano
         humano.adversario = computador
@@ -20,7 +22,7 @@ class Jogo:
         jogador = next(self.sequencia_jogo)
         jogador.faz_pergunta()
         if len(jogador.suspeitos) == 1:
-            print('Vitória do {}'.format(
+            print('\nVitória do {}'.format(
                 jogador.__class__.__name__
             ))
             return False
@@ -28,7 +30,7 @@ class Jogo:
 
 
 if __name__ == '__main__':
-    print('\n', 'JOGO CARA-A-CARA'.center(60, '='), '\n')
+    print('\n', ' JOGO CARA-A-CARA '.center(60, '='), '\n')
     jogo = Jogo(
         homens=['João Pedro', 'Isaac', 
         'Yago', 'Murilo', 'Robert'],

@@ -7,18 +7,25 @@ class Jogador:
         self.suspeitos = Pessoa.lista
         self.personagem = self.escolha(Pessoa.lista, '>> Escolha um personagem **')
         self.adversario = None
+        self.perguntas = {k: v[0].copy() for k, v in Pessoa.TODOS_ATRIBUTOS.items()}
 
     def responde_pergunta(self, atributo, valor):
         return getattr(self.personagem, atributo) == valor
 
     def faz_pergunta(self):
-        atributo = self.escolha(list(Pessoa.TODOS_ATRIBUTOS), 'FAÇA UMA PERGUNTA sobre...')
-        valores = Pessoa.TODOS_ATRIBUTOS[atributo][0]
-        valor = 'tem' if valores[0] == 'tem' else self.escolha(valores, '...igual a...')
+        atributo = self.escolha(list(self.perguntas), 'FAÇA UMA PERGUNTA sobre...')
+        valores = self.perguntas.pop(atributo)
+        valor = self.escolha(valores, '...igual a...')
+        valores.remove(valor)
+        if len(valores) > 1: 
+            self.perguntas[atributo] = valores
         print('-'*100, '\n')
         resposta = self.adversario.responde_pergunta(atributo, valor)
-        self.suspeitos = Pessoa.filtro(atributo, valor, resposta, self.suspeitos)
-        print('[{}] -- {}: {}? {}'.format(
+        self.suspeitos = Pessoa.filtro(atributo, valor, resposta, self.suspeitos)        
+        if valor == 'não tem':
+            resposta = not resposta
+            atributo, valor = 'tem', atributo
+        print('[{}] -- {} {}? {}'.format(
             self.__class__.__name__,
             atributo, valor, 'SIM' if resposta else 'NÃO'
         ))
@@ -30,6 +37,7 @@ class Computador(Jogador):
         return choice(lista)
 
     def exibe_resultado(self):
+        print('Ainda restam {} personagens para o computador descobrir'.format(len(self.suspeitos)))
         print('-'*100)
 
 
