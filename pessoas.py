@@ -33,6 +33,8 @@ class Pessoa:
     
     @staticmethod
     def grade(lista):
+        if isinstance(lista[0], str):
+            return '\n'.join(f'{i} - {p}' for i, p in enumerate(lista))
         head = {**{a: v[-1] for a, v in Pessoa.TODOS_ATRIBUTOS.items()}, **{'nome': 20}}
         return '\n{}\n{}\n'.format(
             ' '.join(c.center(v)[:v] for c, v in head.items()),
