@@ -14,7 +14,7 @@ class Jogo:
                 ).barba = 'não tem'
             else:
                 Pessoa(fake.first_name_male())
-        Pessoa.seleciona(MAIS_COMUM)
+        # Pessoa.seleciona(MAIS_COMUM) # Descomente para ter uma dica...! <<
         computador, humano = Computador(), Humano()
         computador.adversario = humano
         humano.adversario = computador
