@@ -1,4 +1,4 @@
-from pessoas import Pessoa
+from pessoas import Pessoa, FILTER_FUNCTIONS
 from random import choice
 
 
@@ -9,7 +9,7 @@ class Jogador:
         self.adversario = None
 
     def responde_pergunta(self, atributo, valor):
-        return getattr(self.personagem, atributo) == valor
+        return FILTER_FUNCTIONS[True](self.personagem, atributo, valor)
 
     def faz_pergunta(self):
         perguntas = Pessoa.resumo(self.suspeitos)
@@ -17,7 +17,7 @@ class Jogador:
         valor = self.escolha(perguntas[atributo], '...igual a...')
         print('='*100, '\n')
         resposta = self.adversario.responde_pergunta(atributo, valor)
-        self.suspeitos = Pessoa.filtro(atributo, valor, resposta, self.suspeitos)        
+        self.suspeitos = Pessoa.filtro(atributo, valor, self.suspeitos, FILTER_FUNCTIONS[resposta])        
         if valor == 'não tem':
             resposta = not resposta
             atributo, valor = 'tem', atributo
@@ -30,7 +30,10 @@ class Jogador:
 
 class Computador(Jogador):
     def escolha(self, opcoes, mensagem):
-        return choice(opcoes)
+        try:
+            return choice(opcoes)
+        except IndexError:
+            print('\nOpções para {}: {}\n'.format(mensagem, opcoes))
 
     def exibe_resultado(self):
         print('\t{} restantes\n'.format(len(self.suspeitos)), '-'*100)

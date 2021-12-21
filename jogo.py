@@ -1,4 +1,4 @@
-from pessoas import Pessoa
+from pessoas import Pessoa, MAIS_COMUM
 from jogadores import Computador, Humano
 from itertools import cycle
 from faker import Faker
@@ -14,9 +14,11 @@ class Jogo:
                 ).barba = 'não tem'
             else:
                 Pessoa(fake.first_name_male())
+        Pessoa.seleciona(MAIS_COMUM)
         computador, humano = Computador(), Humano()
         computador.adversario = humano
         humano.adversario = computador
+        Pessoa.selecionada = None
         self.sequencia_jogo = cycle([computador, humano])
 
     def executa(self):
@@ -34,7 +36,7 @@ if __name__ == '__main__':
     print('\n', ' JOGO CARA-A-CARA '.center(60, '='), '\n')
     jogo = Jogo(
         fake = Faker('pt_BR'),
-        generos = list('MFFMFMMFMMFFMFMFFMMMFMFFMFFMF')
+        generos = list('MFFMFMMFMMFFMFMFFMMMFMFFMFFMFFFM')
     )
     jogadas = 0
     while jogo.executa():
